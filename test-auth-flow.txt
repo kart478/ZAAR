@@ -1,0 +1,52 @@
+COMMUNITAS Authentication Flow Test
+=====================================
+
+✅ FRONTEND PAGES CREATED:
+- /auth/signup - Sign up with email + password
+- /auth/signin - Sign in with OTP (primary) + password (optional)
+- /auth/verify - Verify 6-digit OTP code
+
+✅ BACKEND OTP ENDPOINTS:
+- POST /api/v1/otp/request-code - Request OTP code
+- POST /api/v1/otp/verify-code - Verify OTP code
+- POST /api/v1/otp/resend-code - Resend OTP code
+
+✅ AUTHENTICATION FEATURES:
+- OTP input with auto-advance and paste support
+- 60-second resend cooldown
+- 3 attempt limit per code
+- 10-minute code expiration
+- JWT tokens with refresh token (httpOnly cookie)
+- Protected routes with automatic redirect
+- Auth context with state management
+- Loading states and error handling
+
+✅ API INTEGRATION:
+- Auto-refresh on 401 errors
+- Secure token storage
+- Consistent error messages
+- Success toasts and notifications
+
+TESTING THE FLOW:
+1. Go to http://localhost:5173
+2. Click "Sign In" (should redirect to /auth/signin)
+3. Enter email: admin@communitas.com
+4. Click "Send Login Code"
+5. Check backend console for OTP code
+6. Go to /auth/verify (auto-redirect)
+7. Enter the 6-digit code
+8. Should redirect to home page authenticated
+
+ALTERNATIVE FLOW:
+1. Go to /auth/signup
+2. Create new account
+3. After signup, go to /auth/signin
+4. Use email + OTP to sign in
+
+SECURITY FEATURES:
+- Rate limiting on OTP requests
+- Attempt limits per code
+- Code expiration
+- Secure token storage
+- Protected routes
+- Input validation and sanitization

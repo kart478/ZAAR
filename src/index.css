@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ZAAR Design System
+   Primary: #A855F7 (vibrant purple)
+   Secondary: #EC4899 (hot pink)
+   Tertiary: #06B6D4 (cyan)
+   Quaternary: #F59E0B (amber)
+   Background: #000000 (pure black)
+   Card: #1A1A1A (dark gray)
+   Border: #333333 (subtle gray)
+   Accent: #8B5CF6 (bright violet)
+   Neon: #10B981 (emerald)
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 300 100% 98%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 300 100% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 300 100% 98%;
+
+    --primary: 300 100% 71%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 330 100% 71%;
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 300 10% 70%;
+
+    --accent: 270 100% 85%;
+    --accent-foreground: 0 0% 0%;
+    --tertiary: 188 100% 50%;
+    --tertiary-foreground: 0 0% 0%;
+    --quaternary: 38 100% 50%;
+    --quaternary-foreground: 0 0% 0%;
+    --neon: 160 100% 42%;
+    --neon-foreground: 0 0% 0%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 300 100% 71%;
+
+    --radius: 0.875rem;
+
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 300 100% 90%;
+    --sidebar-primary: 300 100% 71%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 300 100% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 300 100% 71%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(236, 72, 153, 0.2), 0 4px 12px rgba(0, 0, 0, 0.8);
+  }
+  
+  .shadow-card {
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2), 0 0 30px rgba(139, 92, 246, 0.15), 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(236, 72, 153, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.5), 0 0 60px rgba(236, 72, 153, 0.4); }
+  }
+
+  .glow-vibrant {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  @keyframes text-vibrate {
+    0%, 100% { text-shadow: 0 0 10px rgba(168, 85, 247, 0.8), 0 0 20px rgba(236, 72, 153, 0.6); }
+    25% { text-shadow: 0 0 15px rgba(168, 85, 247, 1), 0 0 30px rgba(236, 72, 153, 0.8); }
+    50% { text-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(168, 85, 247, 0.6); }
+    75% { text-shadow: 0 0 15px rgba(236, 72, 153, 1), 0 0 30px rgba(139, 92, 246, 0.8); }
+  }
+
+  .text-vibrate {
+    animation: text-vibrate 1.5s ease-in-out infinite;
+  }
+
+  @keyframes border-flow {
+    0% { border-color: rgba(168, 85, 247, 0.8); }
+    25% { border-color: rgba(236, 72, 153, 0.8); }
+    50% { border-color: rgba(6, 182, 212, 0.8); }
+    75% { border-color: rgba(245, 158, 11, 0.8); }
+    100% { border-color: rgba(168, 85, 247, 0.8); }
+  }
+
+  .border-flow {
+    animation: border-flow 3s linear infinite;
+    border-width: 2px;
+    border-style: solid;
+  }
+
+  @keyframes background-shift {
+    0% { background: linear-gradient(45deg, #000000, #1a0033); }
+    25% { background: linear-gradient(45deg, #1a0033, #330011); }
+    50% { background: linear-gradient(45deg, #330011, #001a33); }
+    75% { background: linear-gradient(45deg, #001a33, #331a00); }
+    100% { background: linear-gradient(45deg, #331a00, #000000); }
+  }
+
+  .bg-shift {
+    animation: background-shift 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse-rainbow {
+    0% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(236, 72, 153, 0.3); }
+    20% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.6), 0 0 50px rgba(6, 182, 212, 0.4); }
+    40% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.7), 0 0 60px rgba(16, 185, 129, 0.5); }
+    60% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6), 0 0 50px rgba(245, 158, 11, 0.4); }
+    80% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.5), 0 0 40px rgba(168, 85, 247, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(236, 72, 153, 0.3); }
+  }
+
+  .pulse-rainbow {
+    animation: pulse-rainbow 4s ease-in-out infinite;
+  }
+
+  @keyframes glitch {
+    0%, 100% { 
+      transform: translate(0);
+      filter: hue-rotate(0deg);
+    }
+    20% {
+      transform: translate(-2px, 2px);
+      filter: hue-rotate(90deg);
+    }
+    40% {
+      transform: translate(-2px, -2px);
+      filter: hue-rotate(180deg);
+    }
+    60% {
+      transform: translate(2px, 2px);
+      filter: hue-rotate(270deg);
+    }
+    80% {
+      transform: translate(2px, -2px);
+      filter: hue-rotate(360deg);
+    }
+  }
+
+  .glitch {
+    animation: glitch 0.3s ease-in-out infinite;
+  }
+
+  @keyframes neon-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+    75% { opacity: 0.9; }
+  }
+
+  .neon-flicker {
+    animation: neon-flicker 0.15s ease-in-out infinite;
+  }
+
+  .gradient-text {
+    background: linear-gradient(45deg, #A855F7, #EC4899, #06B6D4, #F59E0B, #10B981);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s ease-in-out infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .holographic {
+    background: linear-gradient(45deg, 
+      rgba(168, 85, 247, 0.1), 
+      rgba(236, 72, 153, 0.1), 
+      rgba(6, 182, 212, 0.1), 
+      rgba(245, 158, 11, 0.1), 
+      rgba(16, 185, 129, 0.1)
+    );
+    background-size: 400% 400%;
+    animation: holographic-shift 6s ease-in-out infinite;
+  }
+
+  @keyframes holographic-shift {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+    100% { background-position: 0% 50%; }
+  }
+}
