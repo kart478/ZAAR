@@ -169,7 +169,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return {};
       } catch (err) {
         console.error('Sign up error:', err);
-        return { error: 'An unexpected error occurred during sign up' };
+        if (err instanceof TypeError && err.message === 'Failed to fetch') {
+          return { error: 'Unable to reach Supabase. Check your VITE_SUPABASE_URL, API key, network connection, and restart the app.' };
+        }
+        return { error: err instanceof Error ? err.message : 'An unexpected error occurred during sign up' };
       } finally {
         setLoading(false);
       }

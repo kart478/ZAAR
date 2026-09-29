@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 interface User {
   id: string;
@@ -24,6 +26,7 @@ interface UploadedImage {
 
 const CreateSpace = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -35,6 +38,7 @@ const CreateSpace = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [coverImage, setCoverImage] = useState<UploadedImage | null>(null);
   const [uploadError, setUploadError] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const categories = [
     { value: "content", label: "Content" },
@@ -116,43 +120,33 @@ const CreateSpace = () => {
     document.getElementById('cover-image-input')?.click();
   };
 
-  const uploadImageToStorage = async (file: File): Promise<string> => {
-    // TODO: Implement actual upload to Supabase Storage or other service
-    // For now, return a mock file ID
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-      }, 1000);
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError("");
 
     try {
-      let coverImageFileId: string | undefined;
-
-      // Upload image if present
-      if (coverImage) {
-        coverImageFileId = await uploadImageToStorage(coverImage.file);
+      if (!user) {
+        throw new Error("You must be signed in to create a space.");
       }
 
-      // TODO: Create Space in Supabase
-      console.log("Creating Space:", {
-        ...formData,
-        coverImageFileId,
-        invitedUsers: invitedUsers.map(u => u.id)
+      const { error } = await supabase.from("projects").insert({
+        title: formData.name.trim(),
+        description: formData.description.trim(),
+        tech_stack: formData.category ? [formData.category] : [],
+        roles_needed: [],
+        created_by: user.id,
       });
 
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        // Redirect to the newly created Space Feed
-        navigate(`/space/${formData.name.toLowerCase().replace(/\s+/g, '-')}`);
-      }, 1500);
+      if (error) {
+        throw error;
+      }
+
+      navigate("/spaces");
     } catch (error) {
       console.error('Error creating space:', error);
+      setSubmitError(error instanceof Error ? error.message : "Unable to create this space.");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -400,6 +394,9 @@ const CreateSpace = () => {
 
           {/* Submit Button */}
           <div className="flex justify-end pt-4">
+            {submitError && (
+              <p className="mr-4 self-center text-sm text-destructive">{submitError}</p>
+            )}
             <Button
               type="submit"
               disabled={!formData.name.trim() || !formData.description.trim() || !formData.category || isSubmitting}

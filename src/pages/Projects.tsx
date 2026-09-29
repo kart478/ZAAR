@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Rocket, ExternalLink, Users, Plus, Filter, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 interface Space {
   id: string;
@@ -35,9 +36,54 @@ interface Space {
 const Spaces = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  // TODO: Replace with actual spaces from Supabase
-  const spaces: Space[] = [];
+  useEffect(() => {
+    const loadSpaces = async () => {
+      setIsLoading(true);
+      setLoadError("");
+
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading spaces:", error);
+        setLoadError(error.message);
+        setIsLoading(false);
+        return;
+      }
+
+      setSpaces((data ?? []).map((project) => ({
+        id: project.id,
+        title: project.title,
+        description: project.description ?? "",
+        techStack: project.tech_stack ?? [],
+        repoUrl: project.repo_url ?? undefined,
+        demoUrl: project.demo_url ?? undefined,
+        communityId: project.community_id ?? "",
+        communityName: project.community_name ?? "Independent",
+        communitySlug: project.community_slug ?? "",
+        rolesNeeded: project.roles_needed ?? [],
+        createdBy: {
+          id: project.created_by,
+          name: project.creator_name ?? "ZAAR member",
+          username: project.creator_username ?? "",
+          avatarUrl: project.creator_avatar_url ?? undefined,
+        },
+        collaboratorsCount: project.collaborators_count ?? 0,
+        requestsCount: project.requests_count ?? 0,
+        featured: project.featured ?? false,
+        createdAt: project.created_at,
+      })));
+      setIsLoading(false);
+    };
+
+    loadSpaces();
+  }, []);
 
   const filteredSpaces = spaces.filter(space => {
     const matchesSearch = space.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,7 +155,14 @@ const Spaces = () => {
           </TabsList>
 
           <TabsContent value="all" className="space-y-6">
-            {filteredSpaces.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground">Loading spaces...</div>
+            ) : loadError ? (
+              <div className="text-center py-12">
+                <h3 className="text-lg font-semibold text-foreground mb-2">Unable to load spaces</h3>
+                <p className="text-muted-foreground">{loadError}</p>
+              </div>
+            ) : filteredSpaces.length === 0 ? (
               <div className="text-center py-12">
                 <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
                   <Rocket className="h-12 w-12 text-muted-foreground" />
