@@ -140,13 +140,24 @@ class AuthService {
         // Refresh failed, clear tokens and redirect to login
         this.clearTokens();
         if (typeof window !== 'undefined') {
-          window.location.href = '/auth/signin';
+          window.location.href = '/signin';
         }
         throw refreshError;
       }
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data: ApiResponse<T> = {};
+
+    if (responseText.trim()) {
+      try {
+        data = JSON.parse(responseText) as ApiResponse<T>;
+      } catch {
+        if (!response.ok) {
+          throw new Error(responseText);
+        }
+      }
+    }
 
     if (!response.ok) {
       throw new Error(data.error?.message || data.message || 'Request failed');
@@ -216,7 +227,7 @@ class AuthService {
     });
   }
 
-  // Refresh access token using refresh token cookie
+  // Refresh access token using the HTTP-only refresh token cookie
   async refreshToken(): Promise<ApiResponse<{ accessToken: string; user: User }>> {
     const response = await this.request<{ accessToken: string; user: User }>('/auth/refresh', {
       method: 'POST',

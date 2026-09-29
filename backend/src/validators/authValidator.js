@@ -30,5 +30,10 @@ export const requestPasswordResetSchema = z.object({
 export const verifyPasswordResetSchema = z.object({
   email: z.string().email('Invalid email address'),
   code: z.string().regex(/^\d{6}$/, 'Code must be exactly 6 digits'),
-  newPassword: z.string().min(6, 'New password must be at least 6 characters').max(100, 'New password must be less than 100 characters')
+  newPassword: z.string()
+    .min(8, 'New password must be at least 8 characters')
+    .max(100, 'New password must be less than 100 characters')
+    .regex(/[a-z]/, 'New password must contain a lowercase letter')
+    .regex(/[A-Z]/, 'New password must contain an uppercase letter')
+    .regex(/\d/, 'New password must contain a number')
 });

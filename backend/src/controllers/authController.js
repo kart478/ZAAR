@@ -3,6 +3,25 @@ import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { createSuccessResponse, createErrorResponse, sendResponse } from '../utils/response.js';
 
+const getRefreshToken = (req) => {
+  if (req.body?.refreshToken) {
+    return req.body.refreshToken;
+  }
+
+  const cookieHeader = req.headers.cookie || '';
+  const refreshCookie = cookieHeader.split(';').find(cookie => cookie.trim().startsWith('refreshToken='));
+  return refreshCookie ? decodeURIComponent(refreshCookie.trim().slice('refreshToken='.length)) : null;
+};
+
+const setRefreshTokenCookie = (res, refreshToken) => {
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+};
+
 export const register = async (req, res) => {
   try {
     const { name, username, email, password, bio, interests } = req.body;
@@ -42,6 +61,7 @@ export const register = async (req, res) => {
 
     // Store refresh token
     store.refreshTokens.add(refreshToken);
+    setRefreshTokenCookie(res, refreshToken);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
@@ -87,6 +107,7 @@ export const login = async (req, res) => {
 
     // Store refresh token
     store.refreshTokens.add(refreshToken);
+    setRefreshTokenCookie(res, refreshToken);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
@@ -103,7 +124,7 @@ export const login = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = getRefreshToken(req);
 
     if (!refreshToken || !store.refreshTokens.has(refreshToken)) {
       return sendResponse(res, 401, createErrorResponse('Invalid refresh token'));
@@ -130,11 +151,13 @@ export const refreshToken = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = getRefreshToken(req);
 
     if (refreshToken && store.refreshTokens.has(refreshToken)) {
       store.refreshTokens.delete(refreshToken);
     }
+
+    res.clearCookie('refreshToken');
 
     sendResponse(res, 200, createSuccessResponse(null, 'Logout successful'));
   } catch (error) {

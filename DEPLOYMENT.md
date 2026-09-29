@@ -53,8 +53,8 @@ The `vercel.json` file handles the deployment setup:
   ],
   "routes": [
     {
-      "src": "backend/src/server.js",
-      "dest": "/api"
+      "src": "/api/(.*)",
+      "dest": "/backend/src/server.js"
     }
   ],
   "env": {

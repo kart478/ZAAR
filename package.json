@@ -13,9 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "vercel-build": "npm run build",
-    "api:dev": "ts-node api/simple-password-reset.ts",
-    "api:build": "tsc api/simple-password-reset.ts",
-    "api:start": "node dist/simple-password-reset.js",
+    "api:dev": "npm --prefix backend run dev",
+    "api:build": "npm --prefix backend run build",
+    "api:start": "npm --prefix backend start",
     "api:build-and-start": "npm run api:build && npm run api:start"
   },
   "dependencies": {

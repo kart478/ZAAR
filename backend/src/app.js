@@ -12,7 +12,8 @@ app.use(helmet());
 // CORS configuration
 const allowedOrigins = [
   "http://localhost:5173", // Vite
-];
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
 app.use(
   cors({
