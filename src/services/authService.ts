@@ -147,7 +147,7 @@ class AuthService {
     }
 
     const responseText = await response.text();
-    let data: ApiResponse<T> = {};
+    let data: ApiResponse<T> = { success: false };
 
     if (responseText.trim()) {
       try {

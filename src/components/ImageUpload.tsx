@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 interface UploadedImage {
   file: File;
@@ -159,12 +160,21 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
-export const uploadImageToStorage = async (file: File): Promise<string> => {
-  // TODO: Implement actual upload to Supabase Storage or other service
-  // For now, return a mock file ID
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(`file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-    }, 1000);
-  });
+export const uploadImageToStorage = async (
+  file: File,
+  userId = "anonymous",
+  folder = "uploads",
+): Promise<string> => {
+  const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const filePath = `${folder}/${userId}/${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage
+    .from("user-media")
+    .upload(filePath, file, { contentType: file.type, upsert: false });
+
+  if (error) {
+    throw error;
+  }
+
+  const { data } = supabase.storage.from("user-media").getPublicUrl(filePath);
+  return data.publicUrl;
 };

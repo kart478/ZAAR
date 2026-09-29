@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { dataService } from "@/services/dataService";
+import { uploadImageToStorage } from "@/components/ImageUpload";
 
 interface Community {
   id: string;
@@ -97,16 +98,6 @@ const CreatePost = () => {
     document.getElementById('post-image-input')?.click();
   };
 
-  const uploadImageToStorage = async (file: File): Promise<string> => {
-    // TODO: Implement actual upload to Supabase Storage or other service
-    // For now, return a mock file ID
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-      }, 1000);
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -117,7 +108,7 @@ const CreatePost = () => {
 
       // Upload image if present
       if (postImage) {
-        postImageFileId = await uploadImageToStorage(postImage.file);
+        postImageFileId = await uploadImageToStorage(postImage.file, user!.id, "posts");
       }
 
       // Create post with dataService
@@ -143,12 +134,8 @@ const CreatePost = () => {
     } catch (error) {
       console.error('Error creating post:', error);
       setIsSubmitting(false);
-      setSubmitMessage("Failed to publish post. Please try again.");
-      
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setSubmitMessage("");
-      }, 3000);
+      const errorMessage = error instanceof Error ? error.message : "Unable to publish this post.";
+      setSubmitMessage(`Failed to publish post: ${errorMessage}`);
     }
   };
 

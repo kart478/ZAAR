@@ -110,7 +110,7 @@ const SettingsPage = () => {
       
       // Upload avatar if changed
       if (avatarImage) {
-        avatarFileId = await uploadImageToStorage(avatarImage.file);
+        avatarFileId = await uploadImageToStorage(avatarImage.file, user.id, "avatars");
       }
 
       // Update profile
