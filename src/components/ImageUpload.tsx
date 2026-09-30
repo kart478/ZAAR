@@ -160,21 +160,41 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
+const isMissingStorageBucketError = (error: unknown): boolean => {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  return /bucket\s+not\s+found|storage bucket.*does not exist|missing.*bucket/i.test(message);
+};
+
 export const uploadImageToStorage = async (
   file: File,
   userId = "anonymous",
   folder = "uploads",
-): Promise<string> => {
+): Promise<string | undefined> => {
+  const bucketName = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "user-media";
   const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
   const filePath = `${folder}/${userId}/${crypto.randomUUID()}.${extension}`;
-  const { error } = await supabase.storage
-    .from("user-media")
-    .upload(filePath, file, { contentType: file.type, upsert: false });
 
-  if (error) {
+  try {
+    const { error } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, file, { contentType: file.type, upsert: false });
+
+    if (error) {
+      if (isMissingStorageBucketError(error)) {
+        console.warn(`Supabase storage bucket "${bucketName}" is not configured. Skipping image upload.`, error);
+        return undefined;
+      }
+      throw error;
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+    return data.publicUrl;
+  } catch (error) {
+    if (isMissingStorageBucketError(error)) {
+      console.warn(`Supabase storage bucket "${bucketName}" is not configured. Skipping image upload.`, error);
+      return undefined;
+    }
+
     throw error;
   }
-
-  const { data } = supabase.storage.from("user-media").getPublicUrl(filePath);
-  return data.publicUrl;
 };

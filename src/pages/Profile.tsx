@@ -140,7 +140,7 @@ const Profile = () => {
 
       // Upload avatar if changed
       if (avatarImage) {
-        avatarFileId = await uploadImageToStorage(avatarImage.file, user.id, "avatars");
+        avatarFileId = (await uploadImageToStorage(avatarImage.file, user.id, "avatars")) || avatarFileId;
       }
 
       // Update profile with dataService

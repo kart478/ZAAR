@@ -105,10 +105,16 @@ const CreatePost = () => {
 
     try {
       let postImageFileId: string | undefined;
+      let imageUploadWarning = "";
 
       // Upload image if present
       if (postImage) {
-        postImageFileId = await uploadImageToStorage(postImage.file, user!.id, "posts");
+        const uploadedImageUrl = await uploadImageToStorage(postImage.file, user!.id, "posts");
+        postImageFileId = uploadedImageUrl || undefined;
+
+        if (postImage && !uploadedImageUrl) {
+          imageUploadWarning = "Image upload was skipped because no Supabase storage bucket is configured. Your post was saved without the photo.";
+        }
       }
 
       // Create post with dataService
@@ -123,7 +129,7 @@ const CreatePost = () => {
 
       console.log("Post created successfully:", newPost);
       
-      setSubmitMessage("Post published successfully!");
+      setSubmitMessage(imageUploadWarning || "Post published successfully!");
       
       // Simulate API call
       setTimeout(() => {
